@@ -1,0 +1,23 @@
+create table student (rollno int, name varchar(20), english int, maths int, science int, social int, computer int, total int, average int);
+insert into student value (1,'ravi',82,90,80,95,null,null);
+update student set total=(english+maths+science+social+computer);
+update student set average=total/6;
+alter table student add result varchar(10);
+update student set result ='pass' where average>=40;
+update student ste result = 'fail'
+select * from student;
+select max(english) as high_eng, max(maths) as high_maths, max(science) as high_science, max(social) as high_social,max(computer) as high_computer from students;
+select min(english) as low_eng, min(maths) as low_maths, min(science) as low_science, min(social) as low_social,min(computer) as min_computer from students;
+select table employee (empid int, empname varchar(20), dept varchar(20), salary int);
+insert into employee values (1,'ravi','hr',30000);
+select department min (salary) from employee group by department;
+select department max (salary) from employee group by department;
+create table customers (custid int, custname varchar(20), country varchar(20));
+select country conut(*) form customers group by country;
+select country count(*) as total_count from customers group by country order by total_customer desc;
+select country count(*) as total_count from customers group by country order by total_customer asc;
+select country count(*) from customers group by having count(*)>(select avg(customercount) from (select count(*) as customercount from customers group by country));
+select country count (customerid) as totalcustomers from customers where count is not null group by country having count(customerid)>2 order by totalcustomer desc;
+select country,city count (customerid) as total_customer from customers where country is not null gropu by country,city having count(customerid) order by country order by country asc, city asc;
+select customerid, customername, country, city from customer order by country, city desc;
+select customerid, customername, country, city from customer order by country desc, city desc;

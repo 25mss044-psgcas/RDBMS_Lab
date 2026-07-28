@@ -1,0 +1,104 @@
+alter table student add grade varchar(20);
+
+set serveroutput on;
+declare
+r_count number;
+begin
+update student set grade;
+case 
+when result='pass' and avg>=90 then grade='a'
+when result='pass' and avg>=80 then grade='b'
+when result='pass' and avg>=70 then grade='c'
+when result='pass' and avg>=60 then grade='d'
+else 'better luck next time'
+end;
+v_count:=SQL%ROWCOUNT;
+dbms_output.put_line('row updated:'||v_count);
+end;
+/
+
+declare
+var_row number(5);
+begin
+update
+emp set sal=sal+100;
+if SQL%NOTFOUNT THEN
+dbms_output.put_line('None of the soldiers were updated');
+ELSE IF SQL%FOUND THEN
+var_row:=SQL%ROWCOUNT;
+dbms_output.put_line('salaries for'||var_row||'employees are updated');
+END IF;
+END IF;
+END;
+/
+
+DECLARE
+cursor emp_cur IS select*from emp;
+emp_rec emp%rowtype;
+BEGIN
+OPEN emp_cur;
+LOOP
+FETCH emp_cur INTO emp_rec;
+EXIT WHEN emp_cur%NOTFOUND;
+dbms_output.put_line(emp_rec.Emp_no||""||emp_rec.name||""||emp_rec.sal);
+END LOOP;
+CLOSE emp_cur;
+END;
+/
+
+SET serveroutput ON;
+DECLARE
+cursor c1 IS select ename,sal from emp;
+BEGIN
+for i in c1
+LOOP
+dbms_output.put_line(i.ename||""||i.sal);
+END LOOP;
+END;
+/
+
+DECLARE
+cursor all_emp is select empno,ename from emp order by empno;
+emp1 all_emp%ROWTYPE;
+BEGIN
+open all_emp;
+LOOP
+EXIT WHEN all_emp%NOTFOUND;
+FETCH all_emp INTO emp1;
+dbms_output.put_line(emp1.ename||""||emp1.empno);
+END LOOP;
+CLOSE all_emp;
+END;
+/
+
+DECLARE
+cursor c(jb varch2) IS select ename from emp when job -jb;
+emp emp.job%TYPE;
+BEGIN
+OPEN c('manager');
+dbms_output.put_line('employees working as manager:');
+LOOP
+FETCH c into Em;
+EXIT when c%NOTFOUND;
+dbms_output.put_line(em);
+END LOOP;
+CLOSE c;
+END;
+/
+
+SET serveroutput ON;
+DECLARE
+cursor c_emp IS select sal.ename from EMP where sal=5200;
+v_empdata c_emp%ROWTYPE;
+BEGIN
+OPEN c_emp;
+FETCH c_emp INTO v_empdata;
+WHILE c_emp%FOUND
+LOOP
+dbms_output.put_line(v_empdata.sal);
+END LOOP
+CLOSE c_emp;
+COMMIT;
+END;
+/
+

@@ -1,0 +1,27 @@
+create table department (DeptId int, DeptName varchar(10));
+insert into department values (1,'Computer science');
+insert into department values (&a,'&b');
+create table student (studentid int primary key, coursed int, studentname varchar(20), age int, marks int, deptid int);
+create table enrollment (studentid int, courseid int, enrolldate date, primary key (studentid, coursed));
+---
+create table course(coursed int, coursename varchar(20), deptid int);
+alter table course add credits int;
+alter table course drop column credits;
+alter table course add primary key (courseid);
+---
+create table newdept (deptid int primary key, deptname archar(15) not null unique);
+create table newdept2 (deptid int primary key, deptname varchar(15) not null unique, hodname varchar(20), totalstudent int, check (totalstudent>=0);
+create table newstudent (studentid int, studentname varchar(20), age int, marks int);
+alter table newstudent add primary key (studentid);
+create table newcourse (coursed int, coursename varchar(20), deptid int);
+alter table newcourse add constraint addoncourse primary key (course id);
+alter table newcourse drop primary key;
+create table department (dept int primary key, deptname varchar(20));
+create table student2 (studentid int primary key, studentname varchar(20), age int, deptid int, foreign key (deptid), references department (deptid));
+---
+create table checkstudent (studentid int primary key, studentname varchar(20), age int, check (age between 18 and 21),  marks int);
+create table checkstudent2 (studentid int primary key, studentname varchar(20), age int, check (age not between 18 and 21));
+select * from student where studentname like 'a%';
+select * from student where deptid in(1,3,5);
+select * from student where deptid not in(1,3,5);
+select * from student where deptid=1 or deptid=3 or deptid=5;

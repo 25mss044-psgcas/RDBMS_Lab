@@ -1,0 +1,1133 @@
+-- =====================================================
+-- EXPERIMENT 1
+-- DDL Commands, Constraints and Basic SELECT Queries
+-- =====================================================
+
+--------------------------------------------------------
+--1.CreateDepartmentTable
+--------------------------------------------------------
+CREATE TABLE department (
+    deptid NUMBER PRIMARY KEY,
+    deptname VARCHAR2(20)
+);
+
+--------------------------------------------------------
+--2.InsertDepartmentRecord
+--------------------------------------------------------
+INSERT INTO department VALUES (1, 'Computer Science');
+
+--------------------------------------------------------
+--3.InsertDepartmentRecordUsingSubstitutionVariables
+--------------------------------------------------------
+INSERT INTO department VALUES (&a, '&b');
+
+--------------------------------------------------------
+--4.CommitDepartmentRecords
+--------------------------------------------------------
+COMMIT;
+
+--------------------------------------------------------
+--5.CreateStudentTable
+--------------------------------------------------------
+CREATE TABLE student (
+    studentid NUMBER PRIMARY KEY,
+    courseid NUMBER,
+    studentname VARCHAR2(20),
+    age NUMBER,
+    marks NUMBER,
+    deptid NUMBER
+);
+
+--------------------------------------------------------
+--6.InsertStudentRecords
+--------------------------------------------------------
+INSERT INTO student VALUES (101, 201, 'Arun', 19, 85, 1);
+INSERT INTO student VALUES (102, 202, 'Ajay', 20, 90, 3);
+INSERT INTO student VALUES (103, 203, 'Karthik', 21, 75, 5);
+INSERT INTO student VALUES (104, 204, 'Bala', 20, 80, 2);
+INSERT INTO student VALUES (105, 205, 'Anitha', 19, 95, 1);
+
+--------------------------------------------------------
+--7.CommitStudentRecords
+--------------------------------------------------------
+COMMIT;
+
+--------------------------------------------------------
+--8.CreateCourseTable
+--------------------------------------------------------
+CREATE TABLE course (
+    courseid NUMBER,
+    coursename VARCHAR2(20),
+    deptid NUMBER
+);
+
+--------------------------------------------------------
+--9.AddColumnToCourseTable
+--------------------------------------------------------
+ALTER TABLE course
+ADD credits NUMBER;
+
+--------------------------------------------------------
+--10.DropColumnFromCourseTable
+--------------------------------------------------------
+ALTER TABLE course
+DROP COLUMN credits;
+
+--------------------------------------------------------
+--11.AddPrimaryKeyToCourseTable
+--------------------------------------------------------
+ALTER TABLE course
+ADD PRIMARY KEY (courseid);
+
+--------------------------------------------------------
+--12.InsertCourseRecords
+--------------------------------------------------------
+INSERT INTO course VALUES (201, 'Java', 1);
+INSERT INTO course VALUES (202, 'Python', 3);
+INSERT INTO course VALUES (203, 'DBMS', 5);
+INSERT INTO course VALUES (204, 'Networks', 2);
+INSERT INTO course VALUES (205, 'AI', 1);
+
+--------------------------------------------------------
+--13.CommitCourseRecords
+--------------------------------------------------------
+COMMIT;
+
+--------------------------------------------------------
+--14.CreateEnrollmentTable
+--------------------------------------------------------
+CREATE TABLE enrollment (
+    studentid NUMBER,
+    courseid NUMBER,
+    enrolldate DATE,
+    PRIMARY KEY (studentid, courseid)
+);
+
+--------------------------------------------------------
+--15.InsertEnrollmentRecords
+--------------------------------------------------------
+INSERT INTO enrollment VALUES (101, 201, DATE '2026-01-10');
+INSERT INTO enrollment VALUES (102, 202, DATE '2026-01-12');
+INSERT INTO enrollment VALUES (103, 203, DATE '2026-01-15');
+
+--------------------------------------------------------
+--16.CommitEnrollmentRecords
+--------------------------------------------------------
+COMMIT;
+
+--------------------------------------------------------
+--17.CreateNewDepartmentTable
+--------------------------------------------------------
+CREATE TABLE newdept (
+    deptid NUMBER PRIMARY KEY,
+    deptname VARCHAR2(15) NOT NULL UNIQUE
+);
+
+--------------------------------------------------------
+--18.CreateNewDepartmentTableWithCheckConstraint
+--------------------------------------------------------
+CREATE TABLE newdept2 (
+    deptid NUMBER PRIMARY KEY,
+    deptname VARCHAR2(15) NOT NULL UNIQUE,
+    hodname VARCHAR2(20),
+    totalstudent NUMBER,
+    CHECK (totalstudent >= 0)
+);
+
+--------------------------------------------------------
+--19.CreateNewStudentTable
+--------------------------------------------------------
+CREATE TABLE newstudent (
+    studentid NUMBER,
+    studentname VARCHAR2(20),
+    age NUMBER,
+    marks NUMBER
+);
+
+--------------------------------------------------------
+--20.AddPrimaryKeyToNewStudentTable
+--------------------------------------------------------
+ALTER TABLE newstudent
+ADD PRIMARY KEY (studentid);
+
+--------------------------------------------------------
+--21.CreateNewCourseTable
+--------------------------------------------------------
+CREATE TABLE newcourse (
+    courseid NUMBER,
+    coursename VARCHAR2(20),
+    deptid NUMBER
+);
+
+--------------------------------------------------------
+--22.AddNamedPrimaryKeyConstraint
+--------------------------------------------------------
+ALTER TABLE newcourse
+ADD CONSTRAINT pk_newcourse PRIMARY KEY (courseid);
+
+--------------------------------------------------------
+--23.DropPrimaryKeyConstraint
+--------------------------------------------------------
+ALTER TABLE newcourse
+DROP PRIMARY KEY;
+
+--------------------------------------------------------
+--24.CreateStudentTableWithForeignKey
+--------------------------------------------------------
+CREATE TABLE student2 (
+    studentid NUMBER PRIMARY KEY,
+    studentname VARCHAR2(20),
+    age NUMBER,
+    deptid NUMBER,
+    FOREIGN KEY (deptid)
+        REFERENCES department(deptid)
+);
+
+--------------------------------------------------------
+--25.InsertStudent2Records
+--------------------------------------------------------
+INSERT INTO student2 VALUES (201, 'Ravi', 19, 1);
+INSERT INTO student2 VALUES (202, 'Divya', 20, 1);
+
+--------------------------------------------------------
+--26.CommitStudent2Records
+--------------------------------------------------------
+COMMIT;
+
+--------------------------------------------------------
+--27.CreateStudentTableWithCheckConstraint
+--------------------------------------------------------
+CREATE TABLE checkstudent (
+    studentid NUMBER PRIMARY KEY,
+    studentname VARCHAR2(20),
+    age NUMBER CHECK (age BETWEEN 18 AND 21),
+    marks NUMBER
+);
+
+--------------------------------------------------------
+--28.InsertCheckStudentRecord
+--------------------------------------------------------
+INSERT INTO checkstudent VALUES (301, 'Hari', 19, 88);
+
+--------------------------------------------------------
+--29.CommitCheckStudentRecord
+--------------------------------------------------------
+COMMIT;
+
+--------------------------------------------------------
+--30.CreateStudentTableWithNotBetweenConstraint
+--------------------------------------------------------
+CREATE TABLE checkstudent2 (
+    studentid NUMBER PRIMARY KEY,
+    studentname VARCHAR2(20),
+    age NUMBER CHECK (age NOT BETWEEN 18 AND 21)
+);
+
+--------------------------------------------------------
+--31.InsertCheckStudent2Record
+--------------------------------------------------------
+INSERT INTO checkstudent2 VALUES (401, 'Vijay', 23);
+
+--------------------------------------------------------
+--32.CommitCheckStudent2Record
+--------------------------------------------------------
+COMMIT;
+
+--------------------------------------------------------
+--33.DisplayStudentsWhoseNameStartsWithA
+--------------------------------------------------------
+SELECT *
+FROM student
+WHERE studentname LIKE 'A%';
+
+--------------------------------------------------------
+--34.DisplayStudentsUsingINOperator
+--------------------------------------------------------
+SELECT *
+FROM student
+WHERE deptid IN (1, 3, 5);
+
+--------------------------------------------------------
+--35.DisplayStudentsUsingNOTINOperator
+--------------------------------------------------------
+SELECT *
+FROM student
+WHERE deptid NOT IN (1, 3, 5);
+
+--------------------------------------------------------
+--36.DisplayStudentsUsingOROperator
+--------------------------------------------------------
+SELECT *
+FROM student
+WHERE deptid = 1
+   OR deptid = 3
+   OR deptid = 5;
+
+-- =====================================================
+-- EXPERIMENT 2
+-- DML Commands, Aggregate Functions, GROUP BY, HAVING
+-- ORDER BY
+-- =====================================================
+
+--------------------------------------------------------
+--1.CreateStudentMarksTable
+--------------------------------------------------------
+CREATE TABLE student_marks (
+    rollno NUMBER PRIMARY KEY,
+    name VARCHAR2(20),
+    english NUMBER,
+    maths NUMBER,
+    science NUMBER,
+    social NUMBER,
+    computer NUMBER,
+    total NUMBER,
+    average NUMBER(5,2),
+    result VARCHAR2(10)
+);
+
+--------------------------------------------------------
+--2.InsertFirstStudentRecord
+--------------------------------------------------------
+INSERT INTO student_marks
+VALUES (1, 'Ravi', 82, 90, 80, 95, 88, NULL, NULL, NULL);
+
+--------------------------------------------------------
+--3.InsertSecondStudentRecord
+--------------------------------------------------------
+INSERT INTO student_marks
+VALUES (2, 'Kumar', 75, 68, 72, 80, 85, NULL, NULL, NULL);
+
+--------------------------------------------------------
+--4.InsertThirdStudentRecord
+--------------------------------------------------------
+INSERT INTO student_marks
+VALUES (3, 'Priya', 95, 98, 90, 92, 96, NULL, NULL, NULL);
+
+--------------------------------------------------------
+--5.CommitStudentMarksRecords
+--------------------------------------------------------
+COMMIT;
+
+--------------------------------------------------------
+--6.CalculateTotalMarks
+--------------------------------------------------------
+UPDATE student_marks
+SET total = english + maths + science + social + computer;
+
+--------------------------------------------------------
+--7.CalculateAverageMarks
+--------------------------------------------------------
+UPDATE student_marks
+SET average = total / 5;
+
+--------------------------------------------------------
+--8.UpdatePassResult
+--------------------------------------------------------
+UPDATE student_marks
+SET result = 'Pass'
+WHERE average >= 40;
+
+--------------------------------------------------------
+--9.UpdateFailResult
+--------------------------------------------------------
+UPDATE student_marks
+SET result = 'Fail'
+WHERE average < 40;
+
+--------------------------------------------------------
+--10.CommitUpdatedStudentMarks
+--------------------------------------------------------
+COMMIT;
+
+--------------------------------------------------------
+--11.DisplayStudentMarks
+--------------------------------------------------------
+SELECT *
+FROM student_marks;
+
+--------------------------------------------------------
+--12.DisplayHighestSubjectMarks
+--------------------------------------------------------
+SELECT
+    MAX(english) AS high_english,
+    MAX(maths) AS high_maths,
+    MAX(science) AS high_science,
+    MAX(social) AS high_social,
+    MAX(computer) AS high_computer
+FROM student_marks;
+
+--------------------------------------------------------
+--13.DisplayLowestSubjectMarks
+--------------------------------------------------------
+SELECT
+    MIN(english) AS low_english,
+    MIN(maths) AS low_maths,
+    MIN(science) AS low_science,
+    MIN(social) AS low_social,
+    MIN(computer) AS low_computer
+FROM student_marks;
+
+--------------------------------------------------------
+--14.CreateEmployeeDetailsTable
+--------------------------------------------------------
+CREATE TABLE employee_details (
+    empid NUMBER PRIMARY KEY,
+    empname VARCHAR2(20),
+    department VARCHAR2(20),
+    salary NUMBER
+);
+
+--------------------------------------------------------
+--15.InsertEmployeeRecords
+--------------------------------------------------------
+INSERT INTO employee_details
+VALUES (101, 'Ravi', 'HR', 30000);
+
+INSERT INTO employee_details
+VALUES (102, 'Kumar', 'HR', 35000);
+
+INSERT INTO employee_details
+VALUES (103, 'Priya', 'IT', 45000);
+
+INSERT INTO employee_details
+VALUES (104, 'Anitha', 'IT', 50000);
+
+INSERT INTO employee_details
+VALUES (105, 'Suresh', 'Sales', 28000);
+
+--------------------------------------------------------
+--16.CommitEmployeeRecords
+--------------------------------------------------------
+COMMIT;
+
+--------------------------------------------------------
+--17.DisplayDepartmentMinimumSalary
+--------------------------------------------------------
+SELECT
+    department,
+    MIN(salary) AS minimum_salary
+FROM employee_details
+GROUP BY department;
+
+--------------------------------------------------------
+--18.DisplayDepartmentMaximumSalary
+--------------------------------------------------------
+SELECT
+    department,
+    MAX(salary) AS maximum_salary
+FROM employee_details
+GROUP BY department;
+
+--------------------------------------------------------
+--19.CreateCustomerDetailsTable
+--------------------------------------------------------
+CREATE TABLE customer_details (
+    customerid NUMBER PRIMARY KEY,
+    customername VARCHAR2(20),
+    country VARCHAR2(20),
+    city VARCHAR2(20)
+);
+
+--------------------------------------------------------
+--20.InsertCustomerRecords
+--------------------------------------------------------
+INSERT INTO customer_details
+VALUES (1, 'Arun', 'India', 'Chennai');
+
+INSERT INTO customer_details
+VALUES (2, 'Meena', 'India', 'Madurai');
+
+INSERT INTO customer_details
+VALUES (3, 'John', 'USA', 'New York');
+
+INSERT INTO customer_details
+VALUES (4, 'David', 'USA', 'Boston');
+
+INSERT INTO customer_details
+VALUES (5, 'Asha', 'India', 'Coimbatore');
+
+INSERT INTO customer_details
+VALUES (6, 'Rani', 'Canada', 'Toronto');
+
+INSERT INTO customer_details
+VALUES (7, 'Kevin', 'Canada', 'Ottawa');
+
+INSERT INTO customer_details
+VALUES (8, 'Maria', 'USA', 'Chicago');
+
+--------------------------------------------------------
+--21.CommitCustomerRecords
+--------------------------------------------------------
+COMMIT;
+
+--------------------------------------------------------
+--22.CountCustomersByCountry
+--------------------------------------------------------
+SELECT
+    country,
+    COUNT(*) AS total_customers
+FROM customer_details
+GROUP BY country;
+
+--------------------------------------------------------
+--23.CountCustomersByCountryDescending
+--------------------------------------------------------
+SELECT
+    country,
+    COUNT(*) AS total_customers
+FROM customer_details
+GROUP BY country
+ORDER BY total_customers DESC;
+
+--------------------------------------------------------
+--24.CountCustomersByCountryAscending
+--------------------------------------------------------
+SELECT
+    country,
+    COUNT(*) AS total_customers
+FROM customer_details
+GROUP BY country
+ORDER BY total_customers ASC;
+
+--------------------------------------------------------
+--25.DisplayCountriesAboveAverageCustomerCount
+--------------------------------------------------------
+SELECT
+    country,
+    COUNT(*) AS total_customers
+FROM customer_details
+GROUP BY country
+HAVING COUNT(*) >
+(
+    SELECT AVG(customer_count)
+    FROM
+    (
+        SELECT COUNT(*) customer_count
+        FROM customer_details
+        GROUP BY country
+    )
+);
+
+--------------------------------------------------------
+--26.DisplayCountriesWithMoreThanTwoCustomers
+--------------------------------------------------------
+SELECT
+    country,
+    COUNT(customerid) AS total_customers
+FROM customer_details
+GROUP BY country
+HAVING COUNT(customerid) > 2
+ORDER BY total_customers DESC;
+
+--------------------------------------------------------
+--27.DisplayCustomerCountByCountryAndCity
+--------------------------------------------------------
+SELECT
+    country,
+    city,
+    COUNT(customerid) AS total_customers
+FROM customer_details
+GROUP BY country, city
+ORDER BY country ASC, city ASC;
+
+--------------------------------------------------------
+--28.DisplayCustomersCountryAscendingCityDescending
+--------------------------------------------------------
+SELECT
+    customerid,
+    customername,
+    country,
+    city
+FROM customer_details
+ORDER BY country ASC, city DESC;
+
+--------------------------------------------------------
+--29.DisplayCustomersCountryDescendingCityDescending
+--------------------------------------------------------
+SELECT
+    customerid,
+    customername,
+    country,
+    city
+FROM customer_details
+ORDER BY country DESC, city DESC;
+
+-- =====================================================
+-- EXPERIMENT 3
+-- SQL Functions and Set Operators
+-- =====================================================
+
+--------------------------------------------------------
+--1.CreateEmployeeFunctionsTable
+--------------------------------------------------------
+CREATE TABLE employee_functions (
+    empid NUMBER PRIMARY KEY,
+    ename VARCHAR2(20),
+    sal NUMBER,
+    doj DATE,
+    dept VARCHAR2(20)
+);
+
+--------------------------------------------------------
+--2.InsertEmployeeRecords
+--------------------------------------------------------
+INSERT INTO employee_functions
+VALUES (101, ' John Smith ', 45000,
+        TO_DATE('15-01-2020', 'DD-MM-YYYY'),
+        'IT');
+
+INSERT INTO employee_functions
+VALUES (102, 'PRIYA', 62000,
+        TO_DATE('10-03-2018', 'DD-MM-YYYY'),
+        'HR');
+
+INSERT INTO employee_functions
+VALUES (103, 'Aravind', -5000,
+        TO_DATE('28-02-2021', 'DD-MM-YYYY'),
+        'Sales');
+
+--------------------------------------------------------
+--3.CommitEmployeeRecords
+--------------------------------------------------------
+COMMIT;
+
+--------------------------------------------------------
+--4.DisplayUsingLTRIMFunction
+--------------------------------------------------------
+SELECT LTRIM(ename)
+FROM employee_functions
+WHERE empid = 101;
+
+--------------------------------------------------------
+--5.DisplayUsingRTRIMFunction
+--------------------------------------------------------
+SELECT RTRIM(ename)
+FROM employee_functions
+WHERE empid = 101;
+
+--------------------------------------------------------
+--6.DisplayUsingTRIMFunction
+--------------------------------------------------------
+SELECT TRIM(ename)
+FROM employee_functions
+WHERE empid = 101;
+
+--------------------------------------------------------
+--7.DisplayUsingLPADFunction
+--------------------------------------------------------
+SELECT LPAD(ename, 15, '*')
+FROM employee_functions
+WHERE empid = 102;
+
+--------------------------------------------------------
+--8.DisplayUsingRPADFunction
+--------------------------------------------------------
+SELECT RPAD(ename, 15, '*')
+FROM employee_functions
+WHERE empid = 102;
+
+--------------------------------------------------------
+--9.DisplayUsingCONCATFunction
+--------------------------------------------------------
+SELECT CONCAT(ename, dept)
+FROM employee_functions
+WHERE empid = 102;
+
+--------------------------------------------------------
+--10.DisplayUsingLOWERFunction
+--------------------------------------------------------
+SELECT LOWER(dept)
+FROM employee_functions
+WHERE empid = 102;
+
+--------------------------------------------------------
+--11.DisplayUsingUPPERFunction
+--------------------------------------------------------
+SELECT UPPER(dept)
+FROM employee_functions
+WHERE empid = 103;
+
+--------------------------------------------------------
+--12.DisplayUsingLENGTHFunction
+--------------------------------------------------------
+SELECT LENGTH(TRIM(ename))
+FROM employee_functions
+WHERE empid = 101;
+
+--------------------------------------------------------
+--13.DisplayUsingSUBSTRFunction
+--------------------------------------------------------
+SELECT SUBSTR(TRIM(ename), 1, 4)
+FROM employee_functions
+WHERE empid = 101;
+
+--------------------------------------------------------
+--14.DisplayUsingINSTRFunction
+--------------------------------------------------------
+SELECT INSTR(TRIM(ename), 'S')
+FROM employee_functions
+WHERE empid = 101;
+
+--------------------------------------------------------
+--15.DisplayCurrentSystemDate
+--------------------------------------------------------
+SELECT SYSDATE
+FROM dual;
+
+--------------------------------------------------------
+--16.DisplayUsingNEXTDAYFunction
+--------------------------------------------------------
+SELECT NEXT_DAY(doj, 'MONDAY')
+FROM employee_functions
+WHERE empid = 101;
+
+--------------------------------------------------------
+--17.DisplayUsingADDMONTHSFunction
+--------------------------------------------------------
+SELECT ADD_MONTHS(doj, 6)
+FROM employee_functions
+WHERE empid = 101;
+
+--------------------------------------------------------
+--18.DisplayUsingLASTDAYFunction
+--------------------------------------------------------
+SELECT LAST_DAY(doj)
+FROM employee_functions
+WHERE empid = 101;
+
+--------------------------------------------------------
+--19.DisplayUsingMONTHSBETWEENFunction
+--------------------------------------------------------
+SELECT MONTHS_BETWEEN(SYSDATE, doj)
+FROM employee_functions
+WHERE empid = 102;
+
+--------------------------------------------------------
+--20.DisplayUsingLEASTFunction
+--------------------------------------------------------
+SELECT LEAST(45000, 62000, -5000)
+FROM dual;
+
+--------------------------------------------------------
+--21.DisplayUsingGREATESTFunction
+--------------------------------------------------------
+SELECT GREATEST(sal, 50000)
+FROM employee_functions
+WHERE empid = 101;
+
+--------------------------------------------------------
+--22.DisplayUsingTRUNCFunction
+--------------------------------------------------------
+SELECT TRUNC(1234.5678, 2)
+FROM dual;
+
+--------------------------------------------------------
+--23.DisplayUsingROUNDFunction
+--------------------------------------------------------
+SELECT ROUND(1234.5678, 2)
+FROM dual;
+
+--------------------------------------------------------
+--24.DisplayUsingMODFunction
+--------------------------------------------------------
+SELECT MOD(sal, 1000)
+FROM employee_functions
+WHERE empid = 101;
+
+--------------------------------------------------------
+--25.DisplayUsingPOWERFunction
+--------------------------------------------------------
+SELECT POWER(2, 5)
+FROM dual;
+
+--------------------------------------------------------
+--26.DisplayUsingABSFunction
+--------------------------------------------------------
+SELECT ABS(sal)
+FROM employee_functions
+WHERE empid = 103;
+
+--------------------------------------------------------
+--27.DisplayUsingSIGNFunction
+--------------------------------------------------------
+SELECT SIGN(sal)
+FROM employee_functions
+WHERE empid = 103;
+
+--------------------------------------------------------
+--28.DisplayUsingCEILFunction
+--------------------------------------------------------
+SELECT CEIL(45.23)
+FROM dual;
+
+--------------------------------------------------------
+--29.DisplayUsingFLOORFunction
+--------------------------------------------------------
+SELECT FLOOR(45.89)
+FROM dual;
+
+--------------------------------------------------------
+--30.DisplayUsingEXPFunction
+--------------------------------------------------------
+SELECT EXP(1)
+FROM dual;
+
+--------------------------------------------------------
+--31.DisplayUsingTrigonometricFunctions
+--------------------------------------------------------
+SELECT
+    SIN(0),
+    COS(0),
+    TAN(0)
+FROM dual;
+
+--------------------------------------------------------
+--32.DisplayUsingLOGAndLNFunctions
+--------------------------------------------------------
+SELECT
+    LOG(10, 100) AS log_base10,
+    LN(2.71828) AS natural_log
+FROM dual;
+
+--------------------------------------------------------
+--33.DisplayUsingTOCHARForSalary
+--------------------------------------------------------
+SELECT TO_CHAR(sal, '99,999')
+FROM employee_functions
+WHERE empid = 102;
+
+--------------------------------------------------------
+--34.DisplayUsingTOCHARForDate
+--------------------------------------------------------
+SELECT TO_CHAR(doj, 'DD-MM-YYYY')
+FROM employee_functions
+WHERE empid = 102;
+
+--------------------------------------------------------
+--35.DisplayUsingTONUMBERFunction
+--------------------------------------------------------
+SELECT TO_NUMBER('62000') + 1000
+FROM dual;
+
+--------------------------------------------------------
+--36.DisplayUsingTODATEFunction
+--------------------------------------------------------
+SELECT TO_DATE('25-12-2025', 'DD-MM-YYYY')
+FROM dual;
+
+--------------------------------------------------------
+--37.CreateDepartmentATable
+--------------------------------------------------------
+CREATE TABLE dept_a_exp3 (
+    empid NUMBER,
+    ename VARCHAR2(20)
+);
+
+--------------------------------------------------------
+--38.CreateDepartmentBTable
+--------------------------------------------------------
+CREATE TABLE dept_b_exp3 (
+    empid NUMBER,
+    ename VARCHAR2(20)
+);
+
+--------------------------------------------------------
+--39.InsertDepartmentRecords
+--------------------------------------------------------
+INSERT INTO dept_a_exp3
+VALUES (101, 'John');
+
+INSERT INTO dept_a_exp3
+VALUES (103, 'Aravind');
+
+INSERT INTO dept_b_exp3
+VALUES (102, 'Priya');
+
+INSERT INTO dept_b_exp3
+VALUES (104, 'Kumar');
+
+--------------------------------------------------------
+--40.CommitDepartmentRecords
+--------------------------------------------------------
+COMMIT;
+
+--------------------------------------------------------
+--41.DisplayUsingUNIONOperator
+--------------------------------------------------------
+SELECT empid, ename
+FROM dept_a_exp3
+UNION
+SELECT empid, ename
+FROM dept_b_exp3;
+
+--------------------------------------------------------
+--42.DisplayUsingINTERSECTOperator
+--------------------------------------------------------
+SELECT empid, ename
+FROM dept_a_exp3
+INTERSECT
+SELECT empid, ename
+FROM dept_b_exp3;
+
+--------------------------------------------------------
+--43.DisplayUsingMINUSOperatorFromDepartmentA
+--------------------------------------------------------
+SELECT empid, ename
+FROM dept_a_exp3
+MINUS
+SELECT empid, ename
+FROM dept_b_exp3;
+
+--------------------------------------------------------
+--44.DisplayUsingMINUSOperatorFromDepartmentB
+--------------------------------------------------------
+SELECT empid, ename
+FROM dept_b_exp3
+MINUS
+SELECT empid, ename
+FROM dept_a_exp3;
+
+--------------------------------------------------------
+--45.DisplayDistinctEmployeeNames
+--------------------------------------------------------
+SELECT DISTINCT ename
+FROM dept_b_exp3;
+
+-- =====================================================
+-- EXPERIMENT 4
+-- PL/SQL Programming
+-- SQL% Attributes and Cursor Handling
+-- =====================================================
+
+--------------------------------------------------------
+--1.EnableServerOutput
+--------------------------------------------------------
+SET SERVEROUTPUT ON;
+
+--------------------------------------------------------
+--2.CreateStudentPLSQLTable
+--------------------------------------------------------
+CREATE TABLE student_plsql (
+    rollno NUMBER PRIMARY KEY,
+    studentname VARCHAR2(20),
+    average NUMBER(5,2),
+    result VARCHAR2(10),
+    grade VARCHAR2(20)
+);
+
+--------------------------------------------------------
+--3.InsertStudentPLSQLRecords
+--------------------------------------------------------
+INSERT INTO student_plsql VALUES (1, 'Ravi', 95, 'Pass', NULL);
+INSERT INTO student_plsql VALUES (2, 'Kumar', 84, 'Pass', NULL);
+INSERT INTO student_plsql VALUES (3, 'Priya', 76, 'Pass', NULL);
+INSERT INTO student_plsql VALUES (4, 'Anitha', 68, 'Pass', NULL);
+INSERT INTO student_plsql VALUES (5, 'Suresh', 35, 'Fail', NULL);
+
+--------------------------------------------------------
+--4.CommitStudentPLSQLRecords
+--------------------------------------------------------
+COMMIT;
+
+--------------------------------------------------------
+--5.UpdateStudentGradesUsingSQLRowCount
+--------------------------------------------------------
+DECLARE
+    v_count NUMBER;
+BEGIN
+    UPDATE student_plsql
+    SET grade =
+        CASE
+            WHEN result = 'Pass' AND average >= 90 THEN 'A'
+            WHEN result = 'Pass' AND average >= 80 THEN 'B'
+            WHEN result = 'Pass' AND average >= 70 THEN 'C'
+            WHEN result = 'Pass' AND average >= 60 THEN 'D'
+            ELSE 'Better Luck Next Time'
+        END;
+
+    v_count := SQL%ROWCOUNT;
+
+    DBMS_OUTPUT.PUT_LINE('Rows Updated : ' || v_count);
+END;
+/
+
+--------------------------------------------------------
+--6.DisplayStudentPLSQLRecords
+--------------------------------------------------------
+SELECT *
+FROM student_plsql;
+
+--------------------------------------------------------
+--7.CreateEmployeePLSQLTable
+--------------------------------------------------------
+CREATE TABLE employee_plsql (
+    empno NUMBER PRIMARY KEY,
+    ename VARCHAR2(20),
+    job VARCHAR2(20),
+    sal NUMBER
+);
+
+--------------------------------------------------------
+--8.InsertEmployeePLSQLRecords
+--------------------------------------------------------
+INSERT INTO employee_plsql VALUES (101, 'John', 'MANAGER', 5000);
+INSERT INTO employee_plsql VALUES (102, 'Priya', 'CLERK', 3500);
+INSERT INTO employee_plsql VALUES (103, 'Aravind', 'MANAGER', 5200);
+INSERT INTO employee_plsql VALUES (104, 'Kumar', 'ANALYST', 4500);
+
+--------------------------------------------------------
+--9.CommitEmployeePLSQLRecords
+--------------------------------------------------------
+COMMIT;
+
+--------------------------------------------------------
+--10.UpdateEmployeeSalaryUsingSQLAttributes
+--------------------------------------------------------
+DECLARE
+    var_row NUMBER;
+BEGIN
+    UPDATE employee_plsql
+    SET sal = sal + 100;
+
+    IF SQL%NOTFOUND THEN
+        DBMS_OUTPUT.PUT_LINE('No employees were updated.');
+    ELSIF SQL%FOUND THEN
+        var_row := SQL%ROWCOUNT;
+        DBMS_OUTPUT.PUT_LINE('Salary updated for ' || var_row || ' employees.');
+    END IF;
+END;
+/
+
+--------------------------------------------------------
+--11.DisplayEmployeePLSQLRecords
+--------------------------------------------------------
+SELECT *
+FROM employee_plsql;
+
+--------------------------------------------------------
+--12.DisplayEmployeesUsingExplicitCursor
+--------------------------------------------------------
+DECLARE
+    CURSOR emp_cur IS
+        SELECT *
+        FROM employee_plsql;
+
+    emp_rec employee_plsql%ROWTYPE;
+BEGIN
+    OPEN emp_cur;
+
+    LOOP
+        FETCH emp_cur
+        INTO emp_rec;
+
+        EXIT WHEN emp_cur%NOTFOUND;
+
+        DBMS_OUTPUT.PUT_LINE(
+            emp_rec.empno || '  ' ||
+            emp_rec.ename || '  ' ||
+            emp_rec.sal
+        );
+    END LOOP;
+
+    CLOSE emp_cur;
+END;
+/
+
+--------------------------------------------------------
+--13.DisplayEmployeesUsingCursorForLoop
+--------------------------------------------------------
+DECLARE
+    CURSOR c1 IS
+        SELECT ename, sal
+        FROM employee_plsql;
+BEGIN
+    FOR i IN c1 LOOP
+        DBMS_OUTPUT.PUT_LINE(i.ename || '  ' || i.sal);
+    END LOOP;
+END;
+/
+
+--------------------------------------------------------
+--14.DisplayEmployeesUsingROWTYPECursor
+--------------------------------------------------------
+DECLARE
+    CURSOR all_emp IS
+        SELECT empno, ename
+        FROM employee_plsql
+        ORDER BY empno;
+
+    emp1 all_emp%ROWTYPE;
+BEGIN
+    OPEN all_emp;
+
+    LOOP
+        FETCH all_emp
+        INTO emp1;
+
+        EXIT WHEN all_emp%NOTFOUND;
+
+        DBMS_OUTPUT.PUT_LINE(
+            emp1.empno || '  ' || emp1.ename
+        );
+    END LOOP;
+
+    CLOSE all_emp;
+END;
+/
+
+--------------------------------------------------------
+--15.DisplayEmployeesUsingParameterizedCursor
+--------------------------------------------------------
+DECLARE
+    CURSOR c(job_name VARCHAR2) IS
+        SELECT ename
+        FROM employee_plsql
+        WHERE job = job_name;
+
+    v_emp employee_plsql.ename%TYPE;
+BEGIN
+    OPEN c('MANAGER');
+
+    DBMS_OUTPUT.PUT_LINE('Employees Working as MANAGER');
+
+    LOOP
+        FETCH c
+        INTO v_emp;
+
+        EXIT WHEN c%NOTFOUND;
+
+        DBMS_OUTPUT.PUT_LINE(v_emp);
+    END LOOP;
+
+    CLOSE c;
+END;
+/
+
+--------------------------------------------------------
+--16.DisplayEmployeesUsingWhileLoopCursor
+--------------------------------------------------------
+DECLARE
+    CURSOR c_emp IS
+        SELECT sal, ename
+        FROM employee_plsql
+        WHERE sal = 5300;
+
+    v_empdata c_emp%ROWTYPE;
+BEGIN
+    OPEN c_emp;
+
+    FETCH c_emp
+    INTO v_empdata;
+
+    WHILE c_emp%FOUND LOOP
+        DBMS_OUTPUT.PUT_LINE(
+            v_empdata.ename || '  ' || v_empdata.sal
+        );
+
+        FETCH c_emp
+        INTO v_empdata;
+    END LOOP;
+
+    CLOSE c_emp;
+END;
+/
