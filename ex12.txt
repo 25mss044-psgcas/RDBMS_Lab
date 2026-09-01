@@ -1,0 +1,72 @@
+CREATE TABLE Student_Audit (
+    Audit_ID   INT GENERATED ALWAYS AS IDENTITY,
+    Student_ID INT,
+    Old_Marks  INT,
+    New_Marks  INT,
+    Updated_On DATE
+);
+
+CREATE OR REPLACE TRIGGER trg_student_audit
+AFTER UPDATE ON Student
+FOR EACH ROW
+BEGIN
+    INSERT INTO Student_Audit (
+        Student_ID,
+        Old_Marks,
+        New_Marks,
+        Updated_On
+    )
+    VALUES (
+        :OLD.Student_ID,
+        :OLD.Marks,
+        :NEW.Marks,
+        SYSDATE
+    );
+
+    DBMS_OUTPUT.PUT_LINE(
+        'Audit record inserted successfully'
+    );
+END;
+/
+
+UPDATE Student
+SET Marks = Marks + 10
+WHERE Student_ID = 101;
+
+COMMIT;
+
+SELECT Student_ID, Student_Name, Marks
+FROM Student
+WHERE Student_ID = 101;
+
+SELECT *
+FROM Student_Audit;
+
+SET SERVEROUTPUT ON;
+
+CREATE TABLE Student (
+    Student_ID   INT PRIMARY KEY,
+    Student_Name VARCHAR2(30),
+    Gender       CHAR(1),
+    Age          INT,
+    Email        VARCHAR2(50),
+    Dept_ID      INT,
+    Marks        INT
+);
+
+INSERT INTO Student
+VALUES (101, 'Arun', 'M', 20, 'arun@gmail.com', 1, 78);
+
+INSERT INTO Student
+VALUES (102, 'Priya', 'F', 21, 'priya@gmail.com', 2, 92);
+
+INSERT INTO Student
+VALUES (103, 'Karthik', 'M', 20, 'karthik@gmail.com', 1, 65);
+
+INSERT INTO Student
+VALUES (104, 'Divya', 'F', 22, 'divya@gmail.com', 3, 88);
+
+INSERT INTO Student
+VALUES (105, 'Vijay', 'M', 21, 'vijay@gmail.com', 2, 45);
+
+COMMIT;

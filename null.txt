@@ -1,0 +1,846 @@
+SET SERVEROUTPUT ON;
+SET LINESIZE 150;
+SET PAGESIZE 100;
+
+PROMPT ==========================================
+PROMPT HOSPITAL DATABASE - TABLE CREATION
+PROMPT ==========================================
+
+
+/* =========================================================
+   1. DROP OLD TABLES
+   ========================================================= */
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE Student_Audit CASCADE CONSTRAINTS';
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE Student CASCADE CONSTRAINTS';
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE Appointments CASCADE CONSTRAINTS';
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE Patients CASCADE CONSTRAINTS';
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE Employees CASCADE CONSTRAINTS';
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE Doctors CASCADE CONSTRAINTS';
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE Departments CASCADE CONSTRAINTS';
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END;
+/
+
+/* Remove old procedures/functions/triggers if they exist */
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP PROCEDURE Insert_Student';
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP PROCEDURE Update_Marks';
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP FUNCTION Calculate_Grade';
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TRIGGER trg_student_audit';
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END;
+/
+
+
+/* =========================================================
+   2. CREATE TABLES
+   ========================================================= */
+
+CREATE TABLE Departments (
+    department_id NUMBER PRIMARY KEY,
+    department_name VARCHAR2(30)
+);
+
+CREATE TABLE Doctors (
+    doctor_id NUMBER PRIMARY KEY,
+    doctor_name VARCHAR2(30),
+    specialization VARCHAR2(30),
+    department_id NUMBER,
+    salary NUMBER,
+    CONSTRAINT fk_doctor_dept
+        FOREIGN KEY (department_id)
+        REFERENCES Departments(department_id)
+);
+
+CREATE TABLE Patients (
+    patient_id NUMBER PRIMARY KEY,
+    patient_name VARCHAR2(30),
+    age NUMBER,
+    doctor_id NUMBER,
+    department_id NUMBER,
+    CONSTRAINT fk_patient_doctor
+        FOREIGN KEY (doctor_id)
+        REFERENCES Doctors(doctor_id),
+    CONSTRAINT fk_patient_dept
+        FOREIGN KEY (department_id)
+        REFERENCES Departments(department_id)
+);
+
+CREATE TABLE Appointments (
+    appointment_id NUMBER PRIMARY KEY,
+    patient_id NUMBER,
+    doctor_id NUMBER,
+    appointment_date DATE,
+    CONSTRAINT fk_appt_patient
+        FOREIGN KEY (patient_id)
+        REFERENCES Patients(patient_id),
+    CONSTRAINT fk_appt_doctor
+        FOREIGN KEY (doctor_id)
+        REFERENCES Doctors(doctor_id)
+);
+
+CREATE TABLE Employees (
+    employee_id NUMBER PRIMARY KEY,
+    employee_name VARCHAR2(30),
+    manager_id NUMBER,
+    salary NUMBER
+);
+
+
+/* =========================================================
+   3. INSERT SAMPLE DATA
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT INSERTING SAMPLE DATA
+PROMPT ==========================================
+
+/* Departments */
+
+INSERT INTO Departments VALUES (1, 'Cardiology');
+INSERT INTO Departments VALUES (2, 'Neurology');
+INSERT INTO Departments VALUES (3, 'Orthopedics');
+INSERT INTO Departments VALUES (4, 'Pediatrics');
+
+/* Doctors */
+
+INSERT INTO Doctors VALUES
+(101, 'Dr. Kumar', 'Cardiologist', 1, 90000);
+
+INSERT INTO Doctors VALUES
+(102, 'Dr. Priya', 'Cardiologist', 1, 75000);
+
+INSERT INTO Doctors VALUES
+(103, 'Dr. Arun', 'Neurologist', 2, 85000);
+
+INSERT INTO Doctors VALUES
+(104, 'Dr. Meena', 'Orthopedist', 3, 70000);
+
+INSERT INTO Doctors VALUES
+(105, 'Dr. Ravi', 'Pediatrician', 4, 65000);
+
+INSERT INTO Doctors VALUES
+(106, 'Dr. Siva', 'Dermatologist', NULL, 60000);
+
+/* Patients */
+
+INSERT INTO Patients VALUES
+(1, 'Rahul', 45, 101, 1);
+
+INSERT INTO Patients VALUES
+(2, 'Anitha', 32, 102, 1);
+
+INSERT INTO Patients VALUES
+(3, 'Vijay', 50, 103, 2);
+
+INSERT INTO Patients VALUES
+(4, 'Karthik', 28, 104, 3);
+
+INSERT INTO Patients VALUES
+(5, 'Divya', 10, 105, 4);
+
+INSERT INTO Patients VALUES
+(6, 'Suresh', 60, NULL, NULL);
+
+/* Appointments */
+
+INSERT INTO Appointments VALUES
+(1001, 1, 101, DATE '2026-09-01');
+
+INSERT INTO Appointments VALUES
+(1002, 2, 102, DATE '2026-09-02');
+
+INSERT INTO Appointments VALUES
+(1003, 3, 103, DATE '2026-09-03');
+
+INSERT INTO Appointments VALUES
+(1004, 1, 101, DATE '2026-09-05');
+
+/* Employees */
+
+INSERT INTO Employees VALUES
+(1, 'Ramesh', NULL, 80000);
+
+INSERT INTO Employees VALUES
+(2, 'Suresh', 1, 60000);
+
+INSERT INTO Employees VALUES
+(3, 'Priya', 1, 65000);
+
+INSERT INTO Employees VALUES
+(4, 'Arun', 2, 50000);
+
+INSERT INTO Employees VALUES
+(5, 'Meena', 2, 55000);
+
+COMMIT;
+
+
+/* =========================================================
+   4. DISPLAY TABLE DATA
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT DEPARTMENTS
+PROMPT ==========================================
+
+SELECT * FROM Departments;
+
+PROMPT ==========================================
+PROMPT DOCTORS
+PROMPT ==========================================
+
+SELECT * FROM Doctors;
+
+PROMPT ==========================================
+PROMPT PATIENTS
+PROMPT ==========================================
+
+SELECT * FROM Patients;
+
+PROMPT ==========================================
+PROMPT APPOINTMENTS
+PROMPT ==========================================
+
+SELECT * FROM Appointments;
+
+PROMPT ==========================================
+PROMPT EMPLOYEES
+PROMPT ==========================================
+
+SELECT * FROM Employees;
+
+
+/* =========================================================
+   5. INNER JOIN
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT 1. INNER JOIN
+PROMPT ==========================================
+
+SELECT p.patient_name,
+       d.doctor_name
+FROM Patients p
+INNER JOIN Doctors d
+ON p.doctor_id = d.doctor_id;
+
+
+/* =========================================================
+   6. LEFT OUTER JOIN
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT 2. LEFT OUTER JOIN
+PROMPT ==========================================
+
+SELECT p.patient_name,
+       d.doctor_name
+FROM Patients p
+LEFT OUTER JOIN Doctors d
+ON p.doctor_id = d.doctor_id;
+
+
+/* =========================================================
+   7. RIGHT OUTER JOIN
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT 3. RIGHT OUTER JOIN
+PROMPT ==========================================
+
+SELECT p.patient_name,
+       d.doctor_name
+FROM Patients p
+RIGHT OUTER JOIN Doctors d
+ON p.doctor_id = d.doctor_id;
+
+
+/* =========================================================
+   8. FULL OUTER JOIN
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT 4. FULL OUTER JOIN
+PROMPT ==========================================
+
+SELECT p.patient_name,
+       d.doctor_name
+FROM Patients p
+FULL OUTER JOIN Doctors d
+ON p.doctor_id = d.doctor_id;
+
+
+/* =========================================================
+   9. SELF JOIN
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT 5. SELF JOIN
+PROMPT ==========================================
+
+SELECT e.employee_name AS Employee,
+       m.employee_name AS Manager
+FROM Employees e
+LEFT JOIN Employees m
+ON e.manager_id = m.employee_id;
+
+
+/* =========================================================
+   10. NESTED SUBQUERY
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT 6. NESTED SUBQUERY
+PROMPT ==========================================
+
+SELECT patient_name
+FROM Patients
+WHERE doctor_id IN
+(
+    SELECT doctor_id
+    FROM Doctors
+    WHERE department_id =
+    (
+        SELECT department_id
+        FROM Departments
+        WHERE department_name = 'Cardiology'
+    )
+);
+
+
+/* =========================================================
+   11. CORRELATED SUBQUERY
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT 7. CORRELATED SUBQUERY
+PROMPT ==========================================
+
+SELECT d1.doctor_name,
+       d1.salary,
+       d1.department_id
+FROM Doctors d1
+WHERE d1.salary >
+(
+    SELECT AVG(d2.salary)
+    FROM Doctors d2
+    WHERE d1.department_id = d2.department_id
+);
+
+
+/* =========================================================
+   12. EXISTS OPERATOR
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT 8. EXISTS OPERATOR
+PROMPT ==========================================
+
+SELECT d.doctor_name
+FROM Doctors d
+WHERE EXISTS
+(
+    SELECT 1
+    FROM Appointments a
+    WHERE a.doctor_id = d.doctor_id
+);
+
+
+/* =========================================================
+   13. ANY OPERATOR
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT 9. ANY OPERATOR
+PROMPT ==========================================
+
+SELECT doctor_name,
+       salary
+FROM Doctors
+WHERE salary > ANY
+(
+    SELECT salary
+    FROM Doctors
+    WHERE department_id =
+    (
+        SELECT department_id
+        FROM Departments
+        WHERE department_name = 'Cardiology'
+    )
+);
+
+
+/* =========================================================
+   14. ALL OPERATOR
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT 10. ALL OPERATOR
+PROMPT ==========================================
+
+SELECT doctor_name,
+       salary
+FROM Doctors
+WHERE salary > ALL
+(
+    SELECT salary
+    FROM Doctors
+    WHERE department_id =
+    (
+        SELECT department_id
+        FROM Departments
+        WHERE department_name = 'Cardiology'
+    )
+);
+
+
+/* =========================================================
+   15. CREATE STUDENT TABLE
+   Required for PL/SQL Experiment 8
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT PL/SQL EXPERIMENT 8 - STUDENT TABLE
+PROMPT ==========================================
+
+CREATE TABLE Student (
+    Student_ID NUMBER PRIMARY KEY,
+    Student_Name VARCHAR2(30),
+    Gender CHAR(1),
+    Age NUMBER,
+    Email VARCHAR2(50),
+    Dept_ID NUMBER,
+    Marks NUMBER
+);
+
+
+/* =========================================================
+   16. INSERT STUDENT SAMPLE DATA
+   ========================================================= */
+
+INSERT INTO Student VALUES
+(101, 'Arun', 'M', 20, 'arun@gmail.com', 1, 88);
+
+INSERT INTO Student VALUES
+(102, 'Priya', 'F', 21, 'priya@gmail.com', 2, 76);
+
+INSERT INTO Student VALUES
+(103, 'Kavin', 'M', 20, 'kavin@gmail.com', 1, 65);
+
+INSERT INTO Student VALUES
+(104, 'Meena', 'F', 22, 'meena@gmail.com', 3, 92);
+
+COMMIT;
+
+
+/* =========================================================
+   17. ENABLE DBMS_OUTPUT
+   ========================================================= */
+
+SET SERVEROUTPUT ON;
+
+
+/* =========================================================
+   18. STORED PROCEDURE - INSERT STUDENT
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT 1. INSERT STUDENT PROCEDURE
+PROMPT ==========================================
+
+CREATE OR REPLACE PROCEDURE Insert_Student(
+    p_id     IN NUMBER,
+    p_name   IN VARCHAR2,
+    p_gender IN CHAR,
+    p_age    IN NUMBER,
+    p_email  IN VARCHAR2,
+    p_dept   IN NUMBER,
+    p_marks  IN NUMBER
+)
+IS
+BEGIN
+    INSERT INTO Student
+    VALUES (
+        p_id,
+        p_name,
+        p_gender,
+        p_age,
+        p_email,
+        p_dept,
+        p_marks
+    );
+
+    DBMS_OUTPUT.PUT_LINE(
+        'Student inserted successfully'
+    );
+END;
+/
+
+
+/* =========================================================
+   19. EXECUTE INSERT PROCEDURE
+   ========================================================= */
+
+BEGIN
+    Insert_Student(
+        112,
+        'Ravi',
+        'M',
+        21,
+        'ravi@gmail.com',
+        1,
+        85
+    );
+END;
+/
+
+COMMIT;
+
+
+/* =========================================================
+   20. DISPLAY STUDENT TABLE
+   ========================================================= */
+
+SELECT * FROM Student;
+
+
+/* =========================================================
+   21. FUNCTION - CALCULATE GRADE
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT 2. CALCULATE GRADE FUNCTION
+PROMPT ==========================================
+
+CREATE OR REPLACE FUNCTION Calculate_Grade(
+    p_marks IN NUMBER
+)
+RETURN VARCHAR2
+IS
+    grade VARCHAR2(2);
+BEGIN
+    IF p_marks >= 90 THEN
+        grade := 'A';
+
+    ELSIF p_marks >= 75 THEN
+        grade := 'B';
+
+    ELSIF p_marks >= 60 THEN
+        grade := 'C';
+
+    ELSIF p_marks >= 40 THEN
+        grade := 'D';
+
+    ELSE
+        grade := 'F';
+    END IF;
+
+    RETURN grade;
+END;
+/
+
+
+/* =========================================================
+   22. EXECUTE FUNCTION
+   ========================================================= */
+
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(
+        'Grade: ' || Calculate_Grade(82)
+    );
+END;
+/
+
+
+/* =========================================================
+   23. PARAMETERIZED PROCEDURE - UPDATE MARKS
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT 3. UPDATE MARKS PROCEDURE
+PROMPT ==========================================
+
+CREATE OR REPLACE PROCEDURE Update_Marks(
+    p_id    IN NUMBER,
+    p_marks IN NUMBER
+)
+IS
+BEGIN
+    UPDATE Student
+    SET Marks = p_marks
+    WHERE Student_ID = p_id;
+
+    DBMS_OUTPUT.PUT_LINE(
+        'Marks updated successfully'
+    );
+END;
+/
+
+
+/* =========================================================
+   24. EXECUTE UPDATE PROCEDURE
+   ========================================================= */
+
+BEGIN
+    Update_Marks(101, 95);
+END;
+/
+
+COMMIT;
+
+
+/* =========================================================
+   25. VIEW UPDATED STUDENT
+   ========================================================= */
+
+SELECT * 
+FROM Student
+WHERE Student_ID = 101;
+
+
+/* =========================================================
+   26. IF-ELSE CONTROL STRUCTURE
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT 4. IF-ELSE
+PROMPT ==========================================
+
+DECLARE
+    marks NUMBER := 78;
+BEGIN
+
+    IF marks >= 50 THEN
+        DBMS_OUTPUT.PUT_LINE('PASS');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('FAIL');
+    END IF;
+
+END;
+/
+
+
+/* =========================================================
+   27. CASE CONTROL STRUCTURE
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT 5. CASE
+PROMPT ==========================================
+
+DECLARE
+    marks NUMBER := 88;
+    grade VARCHAR2(2);
+BEGIN
+
+    grade :=
+        CASE
+            WHEN marks >= 90 THEN 'A'
+            WHEN marks >= 75 THEN 'B'
+            WHEN marks >= 60 THEN 'C'
+            WHEN marks >= 40 THEN 'D'
+            ELSE 'F'
+        END;
+
+    DBMS_OUTPUT.PUT_LINE(
+        'Grade: ' || grade
+    );
+
+END;
+/
+
+
+/* =========================================================
+   28. LOOP CONTROL STRUCTURE
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT 6. LOOP
+PROMPT ==========================================
+
+DECLARE
+    i NUMBER := 1;
+BEGIN
+
+    LOOP
+
+        DBMS_OUTPUT.PUT_LINE(
+            'Iteration: ' || i
+        );
+
+        i := i + 1;
+
+        EXIT WHEN i > 5;
+
+    END LOOP;
+
+END;
+/
+
+
+/* =========================================================
+   29. CREATE AUDIT TABLE
+   Experiment 12
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT PL/SQL EXPERIMENT 12 - AUDIT TABLE
+PROMPT ==========================================
+
+CREATE TABLE Student_Audit (
+    Audit_ID NUMBER GENERATED ALWAYS AS IDENTITY,
+    Student_ID NUMBER,
+    Old_Marks NUMBER,
+    New_Marks NUMBER,
+    Updated_On DATE
+);
+
+
+/* =========================================================
+   30. CREATE AFTER UPDATE TRIGGER
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT AFTER UPDATE TRIGGER
+PROMPT ==========================================
+
+CREATE OR REPLACE TRIGGER trg_student_audit
+AFTER UPDATE ON Student
+FOR EACH ROW
+BEGIN
+
+    INSERT INTO Student_Audit (
+        Student_ID,
+        Old_Marks,
+        New_Marks,
+        Updated_On
+    )
+    VALUES (
+        :OLD.Student_ID,
+        :OLD.Marks,
+        :NEW.Marks,
+        SYSDATE
+    );
+
+    DBMS_OUTPUT.PUT_LINE(
+        'Audit record inserted successfully'
+    );
+
+END;
+/
+
+
+/* =========================================================
+   31. TEST UPDATE OPERATION
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT TESTING AUDIT TRIGGER
+PROMPT ==========================================
+
+UPDATE Student
+SET Marks = Marks + 10
+WHERE Student_ID = 101;
+
+COMMIT;
+
+
+/* =========================================================
+   32. VIEW AUDIT RECORDS
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT STUDENT AUDIT RECORDS
+PROMPT ==========================================
+
+SELECT *
+FROM Student_Audit;
+
+
+/* =========================================================
+   33. TEST ANOTHER UPDATE
+   ========================================================= */
+
+UPDATE Student
+SET Marks = Marks + 5
+WHERE Student_ID = 102;
+
+COMMIT;
+
+
+/* =========================================================
+   34. VIEW FINAL AUDIT RECORDS
+   ========================================================= */
+
+SELECT *
+FROM Student_Audit
+ORDER BY Audit_ID;
+
+
+/* =========================================================
+   END
+   ========================================================= */
+
+PROMPT ==========================================
+PROMPT ALL SQL AND PL/SQL PROGRAMS COMPLETED
+PROMPT ==========================================

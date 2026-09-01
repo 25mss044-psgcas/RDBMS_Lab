@@ -1,0 +1,170 @@
+CREATE TABLE Student (
+    Student_ID   INT PRIMARY KEY,
+    Student_Name VARCHAR2(30),
+    Gender       CHAR(1),
+    Age          INT,
+    Email        VARCHAR2(50),
+    Dept_ID      INT,
+    Marks        INT
+);
+
+INSERT INTO Student
+VALUES (101, 'Arun', 'M', 20, 'arun@gmail.com', 1, 78);
+
+INSERT INTO Student
+VALUES (102, 'Priya', 'F', 21, 'priya@gmail.com', 2, 92);
+
+INSERT INTO Student
+VALUES (103, 'Karthik', 'M', 20, 'karthik@gmail.com', 1, 65);
+
+INSERT INTO Student
+VALUES (104, 'Divya', 'F', 22, 'divya@gmail.com', 3, 88);
+
+INSERT INTO Student
+VALUES (105, 'Vijay', 'M', 21, 'vijay@gmail.com', 2, 45);
+
+COMMIT;
+
+SELECT *
+FROM Student;
+
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE PROCEDURE Insert_Student (
+    p_id     INT,
+    p_name   VARCHAR2,
+    p_gender CHAR,
+    p_age    INT,
+    p_email  VARCHAR2,
+    p_dept   INT,
+    p_marks  INT
+)
+IS
+BEGIN
+    INSERT INTO Student
+    VALUES (
+        p_id,
+        p_name,
+        p_gender,
+        p_age,
+        p_email,
+        p_dept,
+        p_marks
+    );
+
+    DBMS_OUTPUT.PUT_LINE('Student inserted successfully');
+END;
+/
+
+BEGIN
+    Insert_Student(
+        112,
+        'Ravi',
+        'M',
+        21,
+        'ravi@gmail.com',
+        1,
+        85
+    );
+END;
+/
+
+SELECT *
+FROM Student;
+
+CREATE OR REPLACE FUNCTION Calculate_Grade (
+    marks INT
+)
+RETURN VARCHAR2
+IS
+    grade VARCHAR2(2);
+BEGIN
+    IF marks >= 90 THEN
+        grade := 'A';
+    ELSIF marks >= 75 THEN
+        grade := 'B';
+    ELSIF marks >= 60 THEN
+        grade := 'C';
+    ELSIF marks >= 40 THEN
+        grade := 'D';
+    ELSE
+        grade := 'F';
+    END IF;
+
+    RETURN grade;
+END;
+/
+
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(
+        'Grade: ' || Calculate_Grade(82)
+    );
+END;
+/
+
+CREATE OR REPLACE PROCEDURE Update_Marks (
+    p_id    INT,
+    p_marks INT
+)
+IS
+BEGIN
+    UPDATE Student
+    SET Marks = p_marks
+    WHERE Student_ID = p_id;
+
+    DBMS_OUTPUT.PUT_LINE('Marks updated successfully');
+END;
+/
+
+BEGIN
+    Update_Marks(101, 95);
+END;
+/
+
+SELECT Student_ID, Student_Name, Marks
+FROM Student
+WHERE Student_ID = 101;
+
+DECLARE
+    marks INT := 78;
+BEGIN
+    IF marks >= 50 THEN
+        DBMS_OUTPUT.PUT_LINE('PASS');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('FAIL');
+    END IF;
+END;
+/
+
+DECLARE
+    marks INT := 88;
+    grade VARCHAR2(2);
+BEGIN
+    grade :=
+        CASE
+            WHEN marks >= 90 THEN 'A'
+            WHEN marks >= 75 THEN 'B'
+            WHEN marks >= 60 THEN 'C'
+            ELSE 'F'
+        END;
+
+    DBMS_OUTPUT.PUT_LINE(
+        'Grade: ' || grade
+    );
+END;
+/
+
+DECLARE
+    i INT := 1;
+BEGIN
+    LOOP
+        DBMS_OUTPUT.PUT_LINE(
+            'Iteration: ' || i
+        );
+
+        i := i + 1;
+
+        EXIT WHEN i > 5;
+    END LOOP;
+END;
+/
