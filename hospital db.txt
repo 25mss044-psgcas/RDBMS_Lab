@@ -1,0 +1,211 @@
+CREATE TABLE Departments (
+    department_id   INT PRIMARY KEY,
+    department_name VARCHAR2(30)
+);
+
+CREATE TABLE Doctors (
+    doctor_id       INT PRIMARY KEY,
+    doctor_name     VARCHAR2(30),
+    specialization  VARCHAR2(30),
+    department_id   INT,
+    salary          INT
+);
+
+CREATE TABLE Patients (
+    patient_id      INT PRIMARY KEY,
+    patient_name    VARCHAR2(30),
+    age             INT,
+    doctor_id       INT,
+    department_id   INT
+);
+
+CREATE TABLE Appointments (
+    appointment_id   INT PRIMARY KEY,
+    patient_id       INT,
+    doctor_id        INT,
+    appointment_date DATE
+);
+
+CREATE TABLE Employees (
+    employee_id   INT PRIMARY KEY,
+    employee_name VARCHAR2(30),
+    manager_id    INT,
+    salary        INT
+);
+
+INSERT INTO Departments
+VALUES (1, 'Cardiology');
+
+INSERT INTO Departments
+VALUES (2, 'Neurology');
+
+INSERT INTO Departments
+VALUES (3, 'Orthopedics');
+
+INSERT INTO Departments
+VALUES (4, 'Pediatrics');
+
+COMMIT;
+
+INSERT INTO Doctors
+VALUES (101, 'Dr. Arun', 'Cardiologist', 1, 90000);
+
+INSERT INTO Doctors
+VALUES (102, 'Dr. Priya', 'Cardiologist', 1, 75000);
+
+INSERT INTO Doctors
+VALUES (103, 'Dr. Kumar', 'Neurologist', 2, 85000);
+
+INSERT INTO Doctors
+VALUES (104, 'Dr. Divya', 'Orthopedic', 3, 70000);
+
+INSERT INTO Doctors
+VALUES (105, 'Dr. Ravi', 'Pediatrician', 4, 65000);
+
+COMMIT;
+
+INSERT INTO Patients
+VALUES (201, 'Karthik', 45, 101, 1);
+
+INSERT INTO Patients
+VALUES (202, 'Meena', 32, 102, 1);
+
+INSERT INTO Patients
+VALUES (203, 'Vijay', 50, 103, 2);
+
+INSERT INTO Patients
+VALUES (204, 'Anitha', 28, 104, 3);
+
+INSERT INTO Patients
+VALUES (205, 'Rohan', 10, 105, 4);
+
+COMMIT;
+
+INSERT INTO Appointments
+VALUES (301, 201, 101, '10-SEP-2026');
+
+INSERT INTO Appointments
+VALUES (302, 202, 102, '11-SEP-2026');
+
+INSERT INTO Appointments
+VALUES (303, 203, 103, '12-SEP-2026');
+
+INSERT INTO Appointments
+VALUES (304, 204, 104, '13-SEP-2026');
+
+COMMIT;
+
+INSERT INTO Employees
+VALUES (401, 'Suresh', NULL, 50000);
+
+INSERT INTO Employees
+VALUES (402, 'Ramesh', 401, 40000);
+
+INSERT INTO Employees
+VALUES (403, 'Geetha', 401, 45000);
+
+INSERT INTO Employees
+VALUES (404, 'Lakshmi', 402, 35000);
+
+COMMIT;
+
+SELECT *
+FROM Departments;
+
+SELECT *
+FROM Doctors;
+
+SELECT *
+FROM Patients;
+
+SELECT *
+FROM Appointments;
+
+SELECT *
+FROM Employees;
+
+SELECT p.patient_name, d.doctor_name
+FROM Patients p
+INNER JOIN Doctors d
+ON p.doctor_id = d.doctor_id;
+
+SELECT p.patient_name, d.doctor_name
+FROM Patients p
+LEFT OUTER JOIN Doctors d
+ON p.doctor_id = d.doctor_id;
+
+SELECT p.patient_name, d.doctor_name
+FROM Patients p
+RIGHT OUTER JOIN Doctors d
+ON p.doctor_id = d.doctor_id;
+
+SELECT p.patient_name, d.doctor_name
+FROM Patients p
+FULL OUTER JOIN Doctors d
+ON p.doctor_id = d.doctor_id;
+
+SELECT e.employee_name AS Employee,
+       m.employee_name AS Manager
+FROM Employees e
+LEFT JOIN Employees m
+ON e.manager_id = m.employee_id;
+
+SELECT patient_name
+FROM Patients
+WHERE doctor_id IN
+(
+    SELECT doctor_id
+    FROM Doctors
+    WHERE department_id =
+    (
+        SELECT department_id
+        FROM Departments
+        WHERE department_name = 'Cardiology'
+    )
+);
+
+SELECT doctor_name, salary, department_id
+FROM Doctors d1
+WHERE salary >
+(
+    SELECT AVG(salary)
+    FROM Doctors d2
+    WHERE d1.department_id = d2.department_id
+);
+
+SELECT doctor_name
+FROM Doctors d
+WHERE EXISTS
+(
+    SELECT 1
+    FROM Appointments a
+    WHERE a.doctor_id = d.doctor_id
+);
+
+SELECT doctor_name, salary
+FROM Doctors
+WHERE salary > ANY
+(
+    SELECT salary
+    FROM Doctors
+    WHERE department_id =
+    (
+        SELECT department_id
+        FROM Departments
+        WHERE department_name = 'Cardiology'
+    )
+);
+
+SELECT doctor_name, salary
+FROM Doctors
+WHERE salary > ALL
+(
+    SELECT salary
+    FROM Doctors
+    WHERE department_id =
+    (
+        SELECT department_id
+        FROM Departments
+        WHERE department_name = 'Cardiology'
+    )
+);
